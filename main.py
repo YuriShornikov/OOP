@@ -1,5 +1,5 @@
 class Student:
-    list_students = {}
+    list_students = []
     def __init__(self, name, surname, gender):
         self.name = name
         self.surname = surname
@@ -7,7 +7,7 @@ class Student:
         self.finished_courses = []
         self.courses_in_progress = []
         self.grades = {}
-        # Student.list_students.append(self.name)
+        Student.list_students.append(self)
 
     def rate_lec(self, lecture, course, grade):
         if isinstance(lecture, Lecturer) and course in lecture.courses_attached and course in self.courses_in_progress:
@@ -18,11 +18,6 @@ class Student:
         else:
             return 'Ошибка'
 
-    # def students_general(self, student, course):
-    #     if isinstance(student, Student) and course in student.courses_attached and course in self.courses_in_progress:
-    #         Student.list_students[self.name] += self.grades
-    #     else:
-    #         return 'Ошибка'
 
     def _average_rate(self):
         sum_grade = 0
@@ -46,10 +41,6 @@ class Student:
             return
         return self._average_rate() < other._average_rate()
 
-
-
-    # def list_students(self):
-
 class Mentor:
     def __init__(self, name, surname):
         self.name = name
@@ -59,12 +50,12 @@ class Mentor:
 
 
 class Lecturer(Mentor):
+    list_lecturers = []
     def __init__(self, name, surname):
-        self.name = name
-        self.surname = surname
+        super().__init__(name, surname)
         self.courses_attached = []
         self.grades = {}
-        self.list_lecturers = {}
+        Lecturer.list_lecturers.append(self)
 
     def _average_rate(self):
         sum_grade = 0
@@ -102,7 +93,6 @@ class Reviewer(Mentor):
         return f'Имя: {self.name}\n' \
                f'Фамилия: {self.surname}'
 
-# def all_average_students(students, courses):
 
 student_1 = Student('Ruoy', 'Eman', 'your_gender')
 student_1.courses_in_progress += ['Python']
@@ -121,7 +111,7 @@ reviewer_2 = Reviewer('Snape', 'Severus')
 reviewer_2.courses_attached += ['C+']
 
 lecture_1 = Lecturer('Ilon', 'Mask')
-lecture_1.courses_attached += ['C+']
+lecture_1.courses_attached += ['Python']
 lecture_2 = Lecturer('James', 'Gosling')
 lecture_2.courses_attached += ['Python']
 
@@ -135,9 +125,9 @@ reviewer_1.rate_hw(student_2, 'Python', 3)
 reviewer_1.rate_hw(student_3, 'C+', 10)
 reviewer_1.rate_hw(student_3, 'C+', 8)
 
-student_1.rate_lec(lecture_1, 'C+', 10)
-student_1.rate_lec(lecture_1, 'C+', 5)
-student_1.rate_lec(lecture_1, 'C+', 0)
+student_1.rate_lec(lecture_1, 'Python', 10)
+student_1.rate_lec(lecture_1, 'Python', 5)
+student_1.rate_lec(lecture_1, 'Python', 0)
 
 student_2.rate_lec(lecture_2, 'Python', 2)
 student_2.rate_lec(lecture_2, 'Python', 2)
@@ -162,8 +152,25 @@ print(student_1 > student_2)
 print(lecture_1 < lecture_2)
 print(lecture_2 < lecture_1)
 
-print(Student.list_students)
+def average_general_student(course='Python'):
+    general_list = []
+    for student in Student.list_students:
+        if course in student.courses_in_progress or course in student.finished_courses:
+            for grades in student.grades.get(course):
+                general_list.append(grades)
+            average_grades = sum(general_list) / len(general_list)
+    return print(f'Средняя оценка студентов за {course} курсу: {average_grades}')
 
+average_general_student()
 
-print(student_1.courses_in_progress)
+def average_general_lecturers(course='Python'):
+    general_list = []
+    for lecturer in Lecturer.list_lecturers:
+        if course in lecturer.courses_attached:
+            for grades in lecturer.grades.get(course):
+                general_list.append(grades)
+            average_grades = sum(general_list) / len(general_list)
+    return print(f'Средняя оценка лекторов по {course} курсу: {average_grades}')
+
+average_general_lecturers()
 
